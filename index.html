@@ -13,7 +13,9 @@ box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:en
 *{box-sizing:border-box;margin:0}
 html{scroll-behavior:smooth}
 body{background:var(--bg);color:var(--ink);font-family:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.6;overflow-x:hidden}
-#bg{position:fixed;inset:0;z-index:0;pointer-events:none}
+#bg{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;display:block}
+body.nogl::before{content:'';position:fixed;right:9%;top:20%;width:40vmin;height:40vmin;border-radius:50%;background:radial-gradient(circle at 35% 30%,#e3eef9,#8fb4dc);opacity:.8;z-index:0;animation:fl 8s ease-in-out infinite}
+@keyframes fl{50%{transform:translateY(-26px) scale(1.04)}}
 main{position:relative;z-index:1;max-width:1080px;margin:0 auto;padding:0 24px}
 nav{display:flex;justify-content:space-between;align-items:center;padding:28px 0;font-size:14px;color:var(--mute)}
 nav b{color:var(--ink);font-weight:600;letter-spacing:.02em}
@@ -149,7 +151,7 @@ lang('es');
 try{
   var cv=document.getElementById('bg');
   var R=new THREE.WebGLRenderer({canvas:cv,alpha:true,antialias:true});
-  R.setPixelRatio(Math.min(devicePixelRatio,2));
+  R.setPixelRatio(Math.min(window.devicePixelRatio||1,1.5));
   var S=new THREE.Scene(),C=new THREE.PerspectiveCamera(45,1,.1,50);C.position.z=6;
   S.add(new THREE.AmbientLight(0xffffff,.75));
   var L1=new THREE.DirectionalLight(0xcfe3f7,.9);L1.position.set(3,4,5);S.add(L1);
@@ -163,7 +165,7 @@ try{
   var mx=0,my=0,t=0;
   addEventListener('pointermove',function(e){mx=e.clientX/innerWidth-.5;my=e.clientY/innerHeight-.5});
   function fit(){var w=innerWidth,h=innerHeight;R.setSize(w,h,false);C.aspect=w/h;C.updateProjectionMatrix();
-    var wide=w>760;grp.position.set(wide?3.0:0,wide?0:1.9,0);grp.scale.setScalar(wide?.92:.6)}
+    var wide=w>760,hw=2.485*C.aspect;grp.position.set(wide?Math.min(3.0,hw*.6):0,wide?0:1.9,0);grp.scale.setScalar(wide?.92:.6)}
   addEventListener('resize',fit);fit();
   var p=g.attributes.position;
   (function loop(){
@@ -179,7 +181,7 @@ try{
     orbs.forEach(function(o,i){var a=t*(1.1+i*.4)+i*2.1;o.position.set(grp.position.x+Math.cos(a)*(2.6+i*.3)*grp.scale.x,grp.position.y+Math.sin(a*.8)*1.6*grp.scale.x,Math.sin(a)*1.5)});
     R.render(S,C);requestAnimationFrame(loop);
   })();
-}catch(err){}
+}catch(err){document.body.classList.add('nogl')}
 </script>
 </body>
 </html>
